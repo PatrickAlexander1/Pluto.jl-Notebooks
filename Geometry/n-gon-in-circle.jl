@@ -97,48 +97,46 @@ $\tag{5} \boxed{  \lim_{n \to \infty}  n\sqrt{\frac{4\pi^2}{n^2}}= \lim_{n \to \
 
 """
 
-# ╔═╡ de6cf66c-3511-4e7d-9e62-ac4f04a27f44
-r = 140
-
-# ╔═╡ 387f42e6-a789-495b-b8ba-987f0234d37e
-
-@drawsvg begin
-Drawing(300, 300,"polygon.svg")
-background("white")
-sethue("black")
-fontface("Times-Roman")
-fontsize(18)
-for i in 1:n
-	line(Point(150 + r*cos(i*(2*pi / n)), 150 + -r*sin(i*(2*pi / n))))
-end
-closepath()
-
-	
-sethue(0.1, 0.3, 0.9)
-fillpreserve()
-
-sethue("black")
-strokepath()
-end
-
-
-# ╔═╡ 94c1a21e-5b0f-4512-a7aa-8ef7f1b398ce
-ngonPerimeter = round(n*sqrt(2 - 2*cos(2*pi / n)),digits=3)
-
 # ╔═╡ b2b7ac01-06b7-434b-ad26-4f758067a6b1
+begin
+
+begin
+ngonPerimeter = round(n*sqrt(2 - 2*cos(2*pi / n)),digits=3)
+end
 difference = round(6.283 - ngonPerimeter,digits = 3)
 
-# ╔═╡ 2569d7b2-a3f4-4413-97a3-8abb38478f17
 begin
-	Markdown.parse("""
-	## Visualization as N Increases
-	Adjusting the number of sides with the slider will show the polygon perimeter and its
-	difference with \$2\\pi\$. With \$100\$ sides, the difference in length is \$\\frac{1}{1000}\$, and the polygon image looks like a circle. Right now the polygon has **`$n`** sides and a perimeter of **`$ngonPerimeter`** which is just **`$difference`** less than \$2\\pi\$ !
-	""")
-
+function randomColorsArray(n::Int)
+	colorArr = []
+	for i in 1:n
+		push!(colorArr, randomhue())
+	end
+	return colorArr
+	end
+end
+	
+begin
+	function drawInEachGridSquare(nrows, ncols, width, height, object)
+		squareSideLength = height / nrows
+		count = 3
+		colors = [(30/255, 64/255, 175/255), "darkgreen", "tomato", "yellow"]
+		for i in 1:nrows
+			for j in 1:ncols
+				p = Point(j*squareSideLength - squareSideLength/2,i*squareSideLength - squareSideLength/2)
+				move(p)
+				object(count, 30, p.x, p.y, colors[i])
+				circle(p, 30, :stroke)
+				count += 1
+			end
+		end
+	end
+end
+	
+begin
+r = 140
 end
 
-# ╔═╡ 1049c79a-05bc-433b-b6ef-891a0d3d5bb9
+begin
 function drawPolygon(nSides, r, x, y, color)
 	
 	move(Point(x +r*cos(1*(2*pi / nSides)), y + -r*sin(1*(2*pi / nSides))))
@@ -147,44 +145,15 @@ function drawPolygon(nSides, r, x, y, color)
 	end
 	closepath()
 	
-	sethue(color)
+	setcolor(color)
 	fillpreserve()
 	
 	sethue("black")
 	strokepath()
-	
-end
-
-
-# ╔═╡ 026b040d-b3b6-49c8-a027-4bdd785ced98
-function randomColorsArray(n::Int)
-	colorArr = []
-	for i in 1:n
-		push!(colorArr, randomhue())
-	end
-	return colorArr
-end
-
-# ╔═╡ acddbb8b-f796-471e-9828-7e985eb09fe9
-colors = randomColorsArray(16)
-
-# ╔═╡ 889107be-f8c1-4360-a115-785cec536210
-function drawInEachGridSquare(nrows, ncols, width, height, object)
-	squareSideLength = height / nrows
-	count = 3
-	for i in 1:nrows
-		for j in 1:ncols
-			p = Point(j*squareSideLength - squareSideLength/2,i*squareSideLength - squareSideLength/2)
-			move(p)
-			object(count, 30, p.x, p.y,colors[count - 2])
-			circle(p, 30, :stroke)
-			count += 1
-		end
 	end
 end
-
-# ╔═╡ 445fe70f-7df3-4155-a736-b7c0e9079b76
-function drawGrid(nrows, ncols, width, height)
+begin
+	function drawGrid(nrows, ncols, width, height)
 	# Draw rows
 	for i in 0:nrows
 		move(Point(0,i* (height/nrows)))
@@ -198,48 +167,39 @@ function drawGrid(nrows, ncols, width, height)
 	closepath()
 	strokepath()
 end
-
-# ╔═╡ b6158e6c-70b1-48ff-a326-0339c1524714
-@drawsvg begin
-width = 430
-height  = 430
-Drawing(width, height,"polygon.svg")
-background("white")
-sethue("black")
-drawGrid(4, 4, width, height)
-drawInEachGridSquare(4, 4, width, height, drawPolygon)
-
 end
 
-# ╔═╡ c35736c2-579d-4391-bca9-a91e2e08b731
-function drawTriangle(v₁::Point, v₂::Point, v₃::Point)
-	move(v₁)
-	line(v₂)
-	line(v₃)
-	closepath()
-	strokepath()
-end
-
-# ╔═╡ 161ecf56-da43-414f-a11d-6bbd48dedea1
+begin
 mutable struct Triangle
 	vertex₁::Point
 	vertex₂::Point
 	vertex₃::Point
 end
+end
 
-# ╔═╡ 37eecdcc-6858-4de6-8550-97eb44f6a1c1
-function translateX(shape, x)
+begin
+	function drawTriangle(v₁::Point, v₂::Point, v₃::Point)
+	move(v₁)
+	line(v₂)
+	line(v₃)
+	closepath()
+	strokepath()
+	end
+end
+
+begin
+	function translateX(shape, x)
 	if typeof(shape) == Triangle
 		newVertex₁ = shape.vertex₁ + Point(x, 0)
 		newVertex₂ = shape.vertex₂ + Point(x, 0)
 		newVertex₃ = shape.vertex₃ + Point(x, 0)
 		return Triangle(newVertex₁, newVertex₂, newVertex₃)
+		end
 	end
 end
-	
 
-# ╔═╡ 93194dce-5294-431e-a5ba-eac902dd8f58
-function translateY(shape, y)
+begin
+	function translateY(shape, y)
 	if typeof(shape) == Triangle
 		newVertex₁ = shape.vertex₁ + Point(0, y)
 		newVertex₂ = shape.vertex₂ + Point(0, y)
@@ -247,9 +207,10 @@ function translateY(shape, y)
 		return Triangle(newVertex₁, newVertex₂, newVertex₃)
 	end
 end
+end
 
-# ╔═╡ d1f492ea-21b0-4813-a51d-c76f6d0c8993
-function reflectX(shape)
+begin
+	function reflectX(shape)
 	if typeof(shape) == Triangle
 		newVertex₁ = Point(shape.vertex₁.x, shape.vertex₁.y - 2*shape.vertex₁.y)
 		newVertex₂ = Point(shape.vertex₂.x, shape.vertex₂.y - 2*shape.vertex₂.y)
@@ -257,18 +218,29 @@ function reflectX(shape)
 		return Triangle(newVertex₁, newVertex₂, newVertex₃)
 	end
 end
+end
 
-# ╔═╡ fcad9f55-fa6c-4c45-886b-ba036d517c1f
-triangle₁ = Triangle(Point(0, 0), Point(140, 0), Point(140*cos(2*pi/8), 140*sin(2*pi/8)))
-
-# ╔═╡ 261b12d4-d721-45db-81d8-91268dbc02dc
-triangle₁
-
-# ╔═╡ 7f0227c3-c241-4b79-bd08-6f42177c7916
-function drawShape(shape)
+begin
+	function drawShape(shape)
 	if typeof(shape) == Triangle
 		drawTriangle(shape.vertex₁, shape.vertex₂, shape.vertex₃)
 	end
+end
+end
+
+"</>"
+end
+
+# ╔═╡ b6158e6c-70b1-48ff-a326-0339c1524714
+@drawsvg begin
+width = 430
+height  = 430
+Drawing(width, height,:svg)
+background("white")
+sethue("black")
+drawGrid(4, 4, width, height)
+drawInEachGridSquare(4, 4, width, height, drawPolygon)
+
 end
 
 # ╔═╡ 625eb5ad-5414-41f8-a23e-d27a9d273df1
@@ -280,7 +252,7 @@ fontsize(16)
 t₁ = L"A"
 t₂ = L"B"
 t₃ = L"C"
-
+triangle₁ = Triangle(Point(0, 0), Point(140, 0), Point(99, 99))
 sethue("black")
 setline(2)
 sector(Point(82, 120), 139, 140, 7/4*pi, 0, :stroke)
@@ -291,13 +263,45 @@ drawShape(translateY(
 sethue("darkred")
 text(t₁, Point(65, 120), halign=:center, valign=:baseline, angle=0)
 circle(Point(80, 120), 4, action = :fill)
-sethue("darkblue")
+sethue(30/255, 64/255, 175/255)
 text(t₂, Point(235, 120), halign=:center, valign=:baseline, angle=0)
 circle(Point(220, 120), 4, action = :fill)
 sethue("green")
 circle(Point(179, 20), 4, action = :fill)
 text(t₃,Point(179, 12), halign=:center, valign=:baseline, angle=0)
 end
+
+# ╔═╡ 2569d7b2-a3f4-4413-97a3-8abb38478f17
+begin
+	Markdown.parse("""
+	## Visualization as N Increases
+	Adjusting the number of sides with the slider will show the polygon perimeter and its
+	difference with \$2\\pi\$. With \$100\$ sides, the difference in length is \$\\frac{1}{1000}\$, and the polygon image looks like a circle. Right now the polygon has **`$n`** sides and a perimeter of **`$ngonPerimeter`** which is just **`$difference`** less than \$2\\pi\$ !
+	""")
+
+end
+
+# ╔═╡ 387f42e6-a789-495b-b8ba-987f0234d37e
+
+@drawsvg begin
+Drawing(300, 300,:svg)
+background("white")
+sethue("black")
+fontface("Times-Roman")
+fontsize(18)
+for i in 1:n
+	line(Point(150 + r*cos(i*(2*pi / n)), 150 + -r*sin(i*(2*pi / n))))
+end
+closepath()
+
+	
+sethue(30/255, 64/255, 175/255)
+fillpreserve()
+
+sethue("black")
+strokepath()
+end
+
 
 # ╔═╡ ea659b7e-7433-4796-84bd-9c5f7b8c6eb0
 TableOfContents(title="Table of Contents")
@@ -1180,7 +1184,6 @@ version = "3.5.0+0"
 
 # ╔═╡ Cell order:
 # ╟─79a26360-1dfc-49d0-83c1-4f1f48cb4d97
-# ╟─acddbb8b-f796-471e-9828-7e985eb09fe9
 # ╟─b6158e6c-70b1-48ff-a326-0339c1524714
 # ╟─b22681d4-1473-46a5-ad29-77578542c67b
 # ╟─625eb5ad-5414-41f8-a23e-d27a9d273df1
@@ -1189,21 +1192,7 @@ version = "3.5.0+0"
 # ╟─88020167-1fd2-4174-93cf-9d970be116f8
 # ╟─387f42e6-a789-495b-b8ba-987f0234d37e
 # ╟─6bbd6510-6d8d-47eb-8ff8-3219cb4af9a4
-# ╟─de6cf66c-3511-4e7d-9e62-ac4f04a27f44
-# ╟─94c1a21e-5b0f-4512-a7aa-8ef7f1b398ce
 # ╟─b2b7ac01-06b7-434b-ad26-4f758067a6b1
-# ╟─889107be-f8c1-4360-a115-785cec536210
-# ╟─261b12d4-d721-45db-81d8-91268dbc02dc
-# ╟─1049c79a-05bc-433b-b6ef-891a0d3d5bb9
-# ╟─026b040d-b3b6-49c8-a027-4bdd785ced98
-# ╟─445fe70f-7df3-4155-a736-b7c0e9079b76
-# ╟─c35736c2-579d-4391-bca9-a91e2e08b731
-# ╟─161ecf56-da43-414f-a11d-6bbd48dedea1
-# ╟─37eecdcc-6858-4de6-8550-97eb44f6a1c1
-# ╟─93194dce-5294-431e-a5ba-eac902dd8f58
-# ╟─d1f492ea-21b0-4813-a51d-c76f6d0c8993
-# ╟─fcad9f55-fa6c-4c45-886b-ba036d517c1f
-# ╟─7f0227c3-c241-4b79-bd08-6f42177c7916
 # ╠═abf7ef51-335d-4496-aaf2-04918343ffd3
 # ╠═9ea0c78c-ef62-49a2-a276-250f67f26ad9
 # ╠═1942d1bc-7da6-42f1-8d48-f514b33f186f
